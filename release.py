@@ -90,7 +90,7 @@ def upload_archives(options, status, uploads):
 				to_upload.append(uploads[i])
 				print "Upload %s/%s as %s" % (status.release_version, uploads[i], url(uploads[i]))
 
-		cmd = options.archive_upload_command.strip()
+		cmd = (options.archive_upload_command or '').strip()
 
 		if to_upload:
 			# Mark all New items as Attempted
@@ -348,7 +348,7 @@ def do_release(local_iface, options):
 		feed_base = os.path.dirname(local_iface.feed_for.keys()[0])
 		feed_files = [options.master_feed_file]
 		print "Upload %s into %s" % (', '.join(feed_files), feed_base)
-		cmd = options.master_feed_upload_command.strip()
+		cmd = (options.master_feed_upload_command or '').strip()
 		if cmd:
 			support.show_and_run(cmd, feed_files)
 		else:
