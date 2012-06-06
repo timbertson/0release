@@ -23,6 +23,15 @@ def show_and_run(cmd, args):
 	print "Executing: %s %s" % (cmd, ' '.join("[%s]" % x for x in args))
 	check_call(['sh', '-c', cmd, '-'] + args)
 
+def show_and_run_with_failure_prompt(prompt, *a, **k):
+	try:
+		show_and_run(*a, **k)
+	except SafeException:
+		print prompt
+		print "C) Continue"
+		print "Q) Quit"
+		if get_choice(['Continue','Quit']) == 'Quit': raise
+
 def suggest_release_version(snapshot_version):
 	"""Given a snapshot version, suggest a suitable release version.
 	>>> suggest_release_version('1.0-pre')

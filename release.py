@@ -99,7 +99,7 @@ def upload_archives(options, status, uploads):
 
 			# Upload them...
 			if cmd:
-				support.show_and_run(cmd, to_upload)
+				support.show_and_run_with_failure_prompt("Upload failed => If you want to continue, you'll have to do it yourself.", cmd, to_upload)
 			else:
 				if len(to_upload) == 1:
 					print "No upload command is set => please upload the archive manually now"
@@ -327,6 +327,7 @@ def do_release(local_iface, options):
 			for b in compiler.get_binary_feeds():
 				support.publish('merged.xml', local = b)
 
+			support.backup_if_exists(options.master_feed_file)
 			support.publish(options.master_feed_file, local = 'merged.xml', xmlsign = True, key = options.key, **publish_opts)
 			os.unlink('merged.xml')
 
@@ -350,7 +351,7 @@ def do_release(local_iface, options):
 		print "Upload %s into %s" % (', '.join(feed_files), feed_base)
 		cmd = (options.master_feed_upload_command or '').strip()
 		if cmd:
-			support.show_and_run(cmd, feed_files)
+			support.show_and_run_with_failure_prompt("Upload failed => If you want to continue, you'll have to do it yourself.", cmd, feed_files)
 		else:
 			print "NOTE: No feed upload command set => you'll have to upload them yourself!"
 
