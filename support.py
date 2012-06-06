@@ -71,18 +71,36 @@ def get_singleton_impl(iface):
 		raise SafeException("Local feed '%s' contains %d versions! I need exactly one!" % (iface.uri, len(impls)))
 	return impls.values()[0]
 
+def backup_name(name): return name + '~'
+
 def backup_if_exists(name):
 	if not os.path.exists(name):
-		return
-	backup = name + '~'
+		return False
+	backup = backup_name(name)
 	if os.path.exists(backup):
 		print "(deleting old backup %s)" % backup
-		if os.path.isdir(backup):
-			shutil.rmtree(backup)
-		else:
-			os.unlink(backup)
+		remove_recursively(backup)
 	os.rename(name, backup)
 	print "(renamed old %s as %s; will delete on next run)" % (name, backup)
+	return True
+
+def remove_recursively(path):
+	if os.path.isdir(path):
+		shutil.rmtree(path)
+	else:
+		os.unlink(path)
+
+def revert_backup(name):
+	backup = backup_name(name)
+	if os.path.exists(backup):
+		if os.path.exists(name):
+			remove_recursively(name)
+		os.rename(backup, name)
+		print "(reverted backup %s to %s)" % (backup, name)
+		return True
+	else:
+		print "ERROR: no backup exists for file %s" % (name,)
+		return False
 
 def get_choice(options):
 	while True:
@@ -136,6 +154,12 @@ class Status(object):
 		except:
 			os.unlink(tmp_name)
 			raise
+	
+	def to_dict(self):
+		return dict([(k,getattr(self, k)) for k in self.__slots__])
+
+	def __repr__(self):
+		return repr(self.to_dict())
 
 def host(address):
 	if hasattr(address, 'hostname'):

@@ -24,6 +24,7 @@ parser.add_option("", "--build-slave", help="compile a binary a source release c
 parser.add_option("-k", "--key", help="GPG key to use for signing", action='store', metavar='KEYID')
 parser.add_option("-v", "--verbose", help="more verbose output", action='count')
 parser.add_option("-r", "--release", help="make a new release", action='store_true')
+parser.add_option("-u", "--undo", help="undo an attempted release, as far as possible", action='store_true')
 parser.add_option("", "--archive-dir-public-url", help="remote directory for releases", metavar='URL')
 parser.add_option("", "--master-feed-file", help="local file to extend with new releases", metavar='PATH')
 parser.add_option("", "--archive-upload-command", help="shell command to upload releases", metavar='COMMAND')
@@ -73,6 +74,9 @@ try:
 	iface = model.Interface(model.canonical_iface_uri(local_feed_path))
 	reader.update(iface, local_feed_path, local = True)
 
+	if options.undo:
+		import undo
+		sys.exit(undo.undo(iface, options))
 	if options.release:
 		import release
 		release.do_release(iface, options)

@@ -78,6 +78,11 @@ class GIT(SCM):
 		self._run_check(['tag', '-s'] + key_opts + ['-m', 'Release %s' % version, tag, revision])
 		print "Tagged as %s" % tag
 
+	def remove_tag(self, version):
+		tag = self.make_tag(version)
+		self._run_check(['tag', '-d', tag])
+		print "Removed tag %s" % tag
+
 	def get_current_branch(self):
 		current_branch = self._run_stdout(['symbolic-ref', 'HEAD']).strip()
 		info("Current branch is %s", current_branch)
