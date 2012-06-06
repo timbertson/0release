@@ -67,6 +67,12 @@ if len(args) != 1:
 
 local_feed_path = args[0]
 
+def suggest_undo():
+	if options.release and local_feed_path and options.master_feed_file:
+		print >>sys.stderr, "NOTE: If you want to rollback and start again, try running:"
+		print >>sys.stderr, "0release --undo --master-feed-file=\"%s\" \"%s\"" % (
+			options.master_feed_file, local_feed_path)
+
 try:
 	if not os.path.exists(local_feed_path):
 		raise SafeException("Local feed file '%s' does not exist" % local_feed_path)
@@ -85,16 +91,10 @@ try:
 		setup.init_releases_directory(iface)
 except KeyboardInterrupt, ex:
 	print >>sys.stderr, "Interrupted"
+	suggest_undo()
 	sys.exit(1)
-except OSError, ex:
+except (OSError, IOError, SafeException), ex:
 	if options.verbose: raise
 	print >>sys.stderr, str(ex)
-	sys.exit(1)
-except IOError, ex:
-	if options.verbose: raise
-	print >>sys.stderr, str(ex)
-	sys.exit(1)
-except SafeException, ex:
-	if options.verbose: raise
-	print >>sys.stderr, str(ex)
+	suggest_undo()
 	sys.exit(1)
