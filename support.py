@@ -119,7 +119,7 @@ class Status(object):
 		tmp_name = release_status_file + '.new'
 		tmp = file(tmp_name, 'w')
 		try:
-			lines = ["%s=%s\n" % (name, getattr(self, name)) for name in self.__slots__ if getattr(self, name)]
+			lines = ["%s=%s\n" % (name, getattr(self, name) or '') for name in self.__slots__ if hasattr(self, name)]
 			tmp.write(''.join(lines))
 			tmp.close()
 			os.rename(tmp_name, release_status_file)
